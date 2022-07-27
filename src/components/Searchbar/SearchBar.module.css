@@ -1,0 +1,75 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  padding: 30px 0 30px 0;
+  border-radius: 10px;
+  background-color: rgb(240, 212, 89);
+  box-shadow: 5px 5px 10px #a4a4a4, -5px -5px 10px #ffffff;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100px;
+  height: 40px;
+  padding: 0;
+
+  border: none;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+  font-size: 20px;
+  background-color: #5199ea;
+  color: #fff;
+
+  cursor: pointer;
+  transition: color var(--hover-animation);
+}
+
+.button:hover,
+.button:focus {
+  color: #1b4371;
+}
+
+.input {
+  width: 180px;
+  height: 40px;
+  padding: 0 10px 0 10px;
+
+  background-color: #fff;
+  color: var(--main-text-color);
+  font-size: 20px;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  border: none;
+  outline: none;
+}
+
+@media screen and (min-width: 768px) {
+  .input {
+    width: 500px;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .input {
+    width: 700px;
+  }
+}
+
+.input:focus {
+  box-shadow: 1px 1px 5px 0px rgba(0, 0, 0, 0.75) inset;
+}
+
+.input::placeholder {
+  color: #929292;
+}
