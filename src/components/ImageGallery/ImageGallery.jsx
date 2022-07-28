@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { RequestApi } from 'components/Api/ReguestApi';
 import { GalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Button } from 'components/Button/Button';
@@ -14,80 +14,71 @@ const STATUS = {
   Success: 'success',
 };
 
-export class ImageGallery extends Component {
-  static propTypes = {
-    handlerOpenModal: PropTypes.func.isRequired,
-    query: PropTypes.string.isRequired,
-  };
+export const ImageGallery = ({ query, handlerOpenModal }) => {
+  const [images, setImages] = useState([]);
+  const [totalHits, setTotalHits] = useState(null);
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState(STATUS.Idle);
 
-  state = {
-    images: [],
-    totalHits: null,
-    page: 1,
-    status: STATUS.Idle,
-  };
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.query !== this.props.query) {
-      this.setState({ status: STATUS.Loading });
-      RequestApi(this.props.query)
-        .then(response => {
-          const { data } = response;
-
-          this.setState(prevState => ({
-            images: [...data.hits],
-            page: 2,
-            totalHits: data.totalHits,
-            status: STATUS.Success,
-          }));
-        })
-        .catch(error => {
-          this.setState({ status: STATUS.Error, error });
-          toast.error('Something went wrong!');
-        });
+  useEffect(() => {
+    if (query === '') {
+      return;
     }
-  }
-
-  handleLoadMore = () => {
-    RequestApi(this.props.query, this.state.page)
+    setStatus(STATUS.Loading);
+    RequestApi(query)
       .then(response => {
-        const { hits } = response.data;
-        this.setState(prevState => ({
-          images: [...prevState.images, ...hits],
-          page: prevState.page + 1,
-        }));
+        const { data } = response;
+
+        setImages([...data.hits]);
+        setPage(2);
+        setTotalHits(data.totalHits);
+        setStatus(STATUS.Success);
       })
       .catch(error => {
-        this.setState(console.log(error));
+        setStatus(STATUS.Error);
+        toast.error('Something went wrong!');
+      });
+  }, [query]);
+
+  const handleLoadMore = () => {
+    RequestApi(query, page)
+      .then(response => {
+        const { hits } = response.data;
+        setImages(ps => [...ps, ...hits]);
+        setPage(page + 1);
+      })
+      .catch(error => {
+        console.log(error);
       });
   };
 
-  render() {
-    const { images, status, totalHits, page } = this.state;
-
-    if (status === STATUS.Loading) {
-      return <Loader />;
-    }
-
-    if (status === STATUS.Success) {
-      return (
-        <>
-          <ul className={s.galleryList}>
-            {images.map(({ id, webformatURL, largeImageURL }) => {
-              return (
-                <GalleryItem
-                  key={id}
-                  imgPrew={webformatURL}
-                  imgLarge={largeImageURL}
-                  handlerOpenModal={this.props.handlerOpenModal}
-                />
-              );
-            })}
-          </ul>
-
-          {totalHits >= 12 * page && <Button onClick={this.handleLoadMore} />}
-        </>
-      );
-    }
+  if (status === STATUS.Loading) {
+    return <Loader />;
   }
-}
+
+  if (status === STATUS.Success) {
+    return (
+      <>
+        <ul className={s.galleryList}>
+          {images.map(({ id, webformatURL, largeImageURL }) => {
+            return (
+              <GalleryItem
+                key={id}
+                imgPrew={webformatURL}
+                imgLarge={largeImageURL}
+                handlerOpenModal={handlerOpenModal}
+              />
+            );
+          })}
+        </ul>
+
+        {totalHits >= 12 * page && <Button onClick={handleLoadMore} />}
+      </>
+    );
+  }
+};
+
+ImageGallery.propType = {
+  query: PropTypes.string.isRequired,
+  handlerOpenModal: PropTypes.func.isRequired,
+};

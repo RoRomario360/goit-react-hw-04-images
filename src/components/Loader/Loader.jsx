@@ -2,7 +2,7 @@ import { Rings } from 'react-loader-spinner';
 import s from './Loader.module.css';
 export const Loader = () => {
   return (
-    <div className={s.loader__wrapper}>
+    <div className={s.loaderWrapper}>
       <Rings
         height="100"
         width="100"
